@@ -1,19 +1,58 @@
 import { useState } from "react";
 
+// Main Function Component
+export default function Game() {
+  const [history, setHistory] = useState([Array(9).fill(null)]);
+  const [currentMove, setCurrentMove] = useState(0);
+  const xIsNext = currentMove % 2 === 0;
+  const currentSquares = history[currentMove];
 
+  function handlePlay(nextSquares) {
+    const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
+    setHistory(nextHistory);
+    setCurrentMove(nextHistory.length - 1);
+  }
 
-// Main Board Components
-export default function Board() {
-  // useState for Squares Make Array
-  const [squares, setSquares] = useState(Array(9).fill(null));
+  function jumpTo(nextMove) {
+    setCurrentMove(nextMove);
+  }
 
-  // useState for X & O
-  const [xIsNext, setXIsNext] = useState(true);
+  const moves = history.map((squares, move) => {
+    let describtion;
+    if (move > 0) {
+      describtion = `Go To move #` + move;
+    } else {
+      describtion = `Go To game start`;
+    }
+    console.log(squares, move);
 
-  // UseState for History
-  const [history, setHistory] = useState(Array(1).fill(Array(9).fill(null)));
-  const [saveR, setSaveR] = useState(0);
+    return (
+      <li key={move}>
+        <button
+          onClick={() => {
+            jumpTo(move);
+          }}
+        >
+          {describtion}
+        </button>
+      </li>
+    );
+  });
 
+  return (
+    <div className="game">
+      <div className="game-board">
+        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+      </div>
+      <div className="game-info">
+        <ol>{moves}</ol>
+      </div>
+    </div>
+  );
+}
+
+//  Board Components
+function Board({ xIsNext, squares, onPlay }) {
   // HandleCLick Function
   function handleClick(i) {
     // Condition for that not remove filled square with X || O
@@ -28,19 +67,8 @@ export default function Board() {
     } else {
       nextSquares[i] = "O";
     }
-    setSquares(nextSquares);
-    setXIsNext(!xIsNext);
 
-    // set Number R
-    let r = saveR;
-    setSaveR(r + 1);
-    // History Variable
-    const changeHistory = history.concat([nextSquares]);
-    setHistory(changeHistory);
-
-    // Consolo.logs ======================================
-    console.log(`Move Number:${r + 1}`, nextSquares);
-    console.log("Histor", changeHistory);
+    onPlay(nextSquares);
   }
 
   // Status Who is the Winner
@@ -77,20 +105,8 @@ export default function Board() {
 
 // Square Components
 function Square({ value, onSquareClick }) {
-  // State for Remembring things
-  // const [value, setValue] = useState(null);
-
-  // HandleClick Function
-  // function handleClick() {
-  //   setValue("X");
-  // }
-
   return (
-    <button
-      //  onClick={handleClick}
-      onClick={onSquareClick}
-      className="square"
-    >
+    <button onClick={onSquareClick} className="square">
       {value}
     </button>
   );
