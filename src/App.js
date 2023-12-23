@@ -1,35 +1,27 @@
 import { useState } from "react";
 
-// Square Components
-function Square({ value, onSquareClick }) {
-  // State for Remembring things
-  // const [value, setValue] = useState(null);
 
-  // HandleClick Function
-  // function handleClick() {
-  //   setValue("X");
-  // }
 
-  return (
-    <button
-      //  onClick={handleClick}
-      onClick={onSquareClick}
-      className="square"
-    >
-      {value}
-    </button>
-  );
-}
-
-// Main Function
+// Main Board Components
 export default function Board() {
+  // useState for Squares Make Array
   const [squares, setSquares] = useState(Array(9).fill(null));
+
+  // useState for X & O
   const [xIsNext, setXIsNext] = useState(true);
+
+  // UseState for History
+  const [history, setHistory] = useState(Array(1).fill(Array(9).fill(null)));
+  const [saveR, setSaveR] = useState(0);
+
   // HandleCLick Function
   function handleClick(i) {
+    // Condition for that not remove filled square with X || O
     if (squares[i] || calculateWinner(squares)) {
       return;
     }
+
+    // Condition for Square Array that it's a X move or O move
     const nextSquares = squares.slice();
     if (xIsNext) {
       nextSquares[i] = "X";
@@ -38,8 +30,20 @@ export default function Board() {
     }
     setSquares(nextSquares);
     setXIsNext(!xIsNext);
+
+    // set Number R
+    let r = saveR;
+    setSaveR(r + 1);
+    // History Variable
+    const changeHistory = history.concat([nextSquares]);
+    setHistory(changeHistory);
+
+    // Consolo.logs ======================================
+    console.log(`Move Number:${r + 1}`, nextSquares);
+    console.log("Histor", changeHistory);
   }
-  // Status
+
+  // Status Who is the Winner
   const winner = calculateWinner(squares);
   let status;
   if (winner) {
@@ -48,6 +52,7 @@ export default function Board() {
     status = "Next player: " + (xIsNext ? "X" : "O");
   }
 
+  // HTML return
   return (
     <>
       <div className="status">{status}</div>
@@ -70,6 +75,28 @@ export default function Board() {
   );
 }
 
+// Square Components
+function Square({ value, onSquareClick }) {
+  // State for Remembring things
+  // const [value, setValue] = useState(null);
+
+  // HandleClick Function
+  // function handleClick() {
+  //   setValue("X");
+  // }
+
+  return (
+    <button
+      //  onClick={handleClick}
+      onClick={onSquareClick}
+      className="square"
+    >
+      {value}
+    </button>
+  );
+}
+
+// Calculate Winner Function
 function calculateWinner(squares) {
   const lines = [
     [0, 1, 2],
